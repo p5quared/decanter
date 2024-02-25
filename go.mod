@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/huh/spinner v0.0.0-20240209193029-45947515c4cf
 	github.com/charmbracelet/lipgloss v0.9.1
 	github.com/speedata/optionparser v1.0.2
+	github.com/supabase-community/supabase-go v0.0.1
 	golang.org/x/oauth2 v0.17.0
 )
 
@@ -29,7 +30,6 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.6 // indirect
-	github.com/supabase-community/supabase-go v0.0.1 // indirect
 	github.com/supabase/postgrest-go v0.0.7 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
