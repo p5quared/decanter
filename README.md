@@ -2,6 +2,7 @@ Autolab from the CLI. Decan't you see why that's awesome?
 
 ## Installation
 `brew install p5quared/decanter/decanter`
+or build from source via `go install`.
 
 
 ## Usage
