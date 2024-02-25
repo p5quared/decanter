@@ -317,14 +317,27 @@ func main() {
 		return
 	}
 
+	fs := NewFileTokenStore("auth.json")
 	c := newAutolabClient(
 		Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host),
-		NewFileTokenStore("auth.json"),
+		fs,
 	)
+
+	if ex[0] == "setup" {
+		setup(Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host), fs)
+		return
+	}
+
+	// check that we have a token
+	_, err = fs.Load()
+	if err != nil {
+		fmt.Println("Error: No token found. Please run 'decanter setup' to authorize a new device.")
+		return
+	}
 
 	switch ex[0] {
 	case "setup":
-		setup(Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host), NewFileTokenStore("auth.json"))
+		setup(Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host), fs)
 	case "submit":
 		if course == "" || assessment == "" || file == "" {
 			// TODO: Form theme.
