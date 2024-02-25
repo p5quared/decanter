@@ -49,6 +49,11 @@ changelog:
 # .goreleaser.yaml
 brews:
   -
+    tap:
+      owner: p5quared
+      name: homebrew-decanter
+
+
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
