@@ -56,4 +56,6 @@ brews:
 
     homepage: "https://github.com/p5quared/decanter"
     description: "Decan't you see why it would be awesome to submit homework from the command line?"
+    license: "MIT"
+
 
