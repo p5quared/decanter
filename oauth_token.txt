@@ -1,0 +1,25 @@
+We do this first, then the user enters a code in the browser
+
+-X GET https://autolab.cse.buffalo.edu/oauth/device_flow_init --data-urlencode "client_id=D4MZfAzZ27U121M2vwnHMEN6Cz-RMrQIKMlVjpEuKh8"
+response {
+		device_code: "",
+		user_code: "" (user enters this),
+		verification_uri: "" (user enters code here),
+	}
+
+We poll /device_flow_authorize until we get a succes response
+-X GET https://autolab.cse.buffalo.edu/oauth/device_flow_authorize --data-urlencode "client_id=D4MZfAzZ27U121M2vwnHMEN6Cz-RMrQIKMlVjpEuKh8" --data-urlencode "device_code=DKYH0s"
+
+Polling limit is 5 seconds by default
+request_body{
+	client_id
+	device_code
+}
+
+response codes {
+	400 - pending
+	429 - polling too fast
+	200 - success {
+		code: authorization code
+	}
+}
