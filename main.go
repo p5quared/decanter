@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
-	"strconv"
 	"time"
 
 	"github.com/speedata/optionparser"
@@ -258,18 +257,15 @@ func displaySubmission(submission Autolab.SubmissionsResponse) {
 			}
 		})
 	scores := submission.Scores
-	var keys []int
+	keys := make([]string, 0, len(scores))
 	for k := range scores {
-		n, _ := strconv.Atoi(k)
-		keys = append(keys, n)
+		keys = append(keys, k)
 	}
 
-	sort.Ints(keys)
+	sort.Strings(keys)
 
-	for _, prob := range keys {
-		score := scores[strconv.Itoa(prob)]
-		prob_str := strconv.Itoa(prob)
-		t.Row(prob_str, strconv.FormatFloat(score, 'f', -1, 32))
+	for _, k := range keys {
+		t.Row(k, fmt.Sprintf("%.2f", scores[k]))
 	}
 	fmt.Println(t.Render())
 }
