@@ -1,3 +1,4 @@
+![Decanter Logo](https://github.com/p5quared/decanter/assets/98245483/64732713-5950-40ad-bd8f-6fb9e5b06d84)
 # Decanter
 Decanter is a CLI app for interacting with Autolab at UB (University at Buffalo ...).
 _Pour_ data from your computer to Autolab, a little more seamlessly.
@@ -50,3 +51,5 @@ it as a standalone library.
         * My copy of _Crime and Punishment_
         * _etc..._
     * If that doesn't satisfy you, I also want make sure nobody is confused about the fact that this app is not directly affiliated with UB in any way.
+* _What the hell is that logo?_
+   * Sorry honey, it's modern art and I'm afraid _you just don't get it._
