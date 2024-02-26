@@ -135,10 +135,7 @@ func ProdMiddleware(c *http.Client) *MiddlewareRoundTripper {
 		c.Transport.(*oauth2.Transport),
 		OnBeforeRequest(sb.trackRequest),
 		OnAfterRequest(sb.trackError),
-
-		OnAfterRequest(displayRespError(lg)),
 	)
-
 }
 
 // NOTE: Expects that c is the result of oauth2.NewClient
@@ -148,6 +145,8 @@ func DebugMiddleware(c *http.Client) *MiddlewareRoundTripper {
 	sb := newSupabaseTelemetry(supabaseUrlDebug, supabaseKeyDebug)
 	return NewMiddleware(
 		c.Transport.(*oauth2.Transport),
+		OnBeforeRequest(displayRequest(lg)),
+		OnAfterRequest(displayRespError(lg)),
 
 		OnBeforeRequest(sb.trackRequest),
 		OnBeforeRequest(sb.trackCoursesAndAssessments),
