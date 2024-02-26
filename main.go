@@ -288,16 +288,17 @@ func main() {
 
 	op := optionparser.NewOptionParser()
 	var file string
-	op.On("-f NAME", "--file NAME", "Specify file.", &file)
+	op.On("-f NAME", "--file NAME", "Specify file. -f main.go", &file)
 
 	var assessment string
-	op.On("-a NAME", "--assessment NAME", "Specify an assessment.", &assessment)
+	op.On("-a NAME", "--assessment NAME", "Specify an assessment. -a pa1", &assessment)
 
 	var course string
-	op.On("-c NAME", "--course NAME", "Specify a course.", &course)
+	op.On("-c NAME", "--course NAME", "Specify a course. -c cse468-s24", &course)
 
+	// Wait... This doesn't actually do anything (yet) lol
 	var wait bool
-	op.On("-w", "--wait", "Waits for additional info (if applicable). ex: 'submit -w' will wait for and display results.", &wait)
+	op.On("-w", "--wait", "Waits for additional info (if applicable). ex: 'submit -w' will wait for and display results. (NOT CURRENTLY IMPLEMENTED)", &wait)
 
 	op.Command("setup", "Setup (authorize) a new device (you should only need to do this once).")
 	op.Command("submit", "Submit to an assessment.Available flags: --course, --assessment, --file, --wait")
@@ -334,6 +335,16 @@ func main() {
 	switch ex[0] {
 	case "setup":
 		setup(Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host), fs)
+	// TODO: Should be a multipart form;
+	// 1. Select course
+	// 2. Select assessment
+	// 3. Select file
+	// Where each steps are pre-populated with
+	// the users possible options, so they don't
+	// have to remember the course/assessment names.
+	// TODO: Save last used course/assessment to a cache
+	// to avoid user having to re-enter it.
+	// Prompt like "Resubmit [file] to [assessment]?"
 	case "submit":
 		if course == "" || assessment == "" || file == "" {
 			// TODO: Form theme.
