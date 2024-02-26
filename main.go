@@ -381,9 +381,8 @@ func main() {
 		if err != nil {
 			fmt.Println("Error submitting file: ", err)
 		} else {
-			var emphasis = lipgloss.NewStyle().Bold(true).Foreground(colorPrimary)
-			fmt.Println()
-			fmt.Printf("%s %s to %s!\n", finished("Successfully submit"), emphasis.Render(file), emphasis.Render(assessment))
+			var emphasis = lipgloss.NewStyle().Bold(true).Foreground(colorPrimary).Render
+			fmt.Printf("%s %s to %s!\n", finished("Successfully submit"), emphasis(file), emphasis(assessment))
 		}
 	case "list":
 		if len(ex) < 2 {
@@ -392,16 +391,12 @@ func main() {
 		}
 		switch ex[1] {
 		case "courses":
-			start := time.Now()
-
 			var courses []Autolab.CoursesResponse
-			var numCourses int
 			spinner.New().
 				Title("Fetching course data...").
 				Style(spinStyle).
 				Action(func() {
 					courses, _ = Autolab.GetUserCourses(c, host)
-					numCourses = len(courses)
 					courses = filterCourses(courses, func(c Autolab.CoursesResponse) bool {
 						return c.Semester == "s24"
 					})
@@ -409,12 +404,6 @@ func main() {
 
 			fmt.Println(finished("Fetched course data"))
 			displayCourseList(courses)
-			var helpStyle = lipgloss.NewStyle().
-				Foreground(colorTextSubtle)
-			elapsed := time.Since(start)
-			// Not actually true, as we fetched the courses earlier and got assignments now.
-			s := fmt.Sprintf("\nFetched and processed %d courses in %v", numCourses, elapsed.Truncate(time.Millisecond))
-			fmt.Println(helpStyle.Render(s))
 		case "assessments", "ass":
 			var courses []Autolab.CoursesResponse
 			spinner.New().
