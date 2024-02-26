@@ -1,4 +1,6 @@
+decanter
 .env
 auth.json
+.DS_STORE
 
 dist/
