@@ -36,6 +36,9 @@ the code.
 At some point I'll be cleaning up the Autolab API and publishing
 it as a standalone library.
 
+If you've read this far, I'd really appreciate if you'd give the repo
+a ⭐or a watch. We need to reach a certain threshold of 'notoriety' 
+before Homebrew will accept our formulae.
 
 ## FAQ
 
