@@ -1,15 +1,5 @@
 # Todos
 
-## Important (Before Release)
-These are mostly bigger tasks that will take several
-hours to complete.
-
-### Configure Homebrew Formulae
-This will take a while.
-
-### Final Visual
-* Viewing submissions
-
 ## Backlog
 Mostly trivial; could be done by anyone.
 
@@ -29,9 +19,6 @@ oAuth2 according to official standards.
 * Global lipgloss elements
 
 ### Refactor
-* Modules for:
-    * interaction with proxy server
-    * visual elements
 * Create generic wrapper for server interactions
     * i.e. doWithSpinner(loading, done string, func () {})
 
