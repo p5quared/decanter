@@ -147,9 +147,9 @@ func DebugMiddleware(c *http.Client) *MiddlewareRoundTripper {
 		c.Transport.(*oauth2.Transport),
 		OnBeforeRequest(displayRequest(lg)),
 		OnAfterRequest(displayRespError(lg)),
+		OnBeforeRequest(displayPath(lg)),
 
 		OnBeforeRequest(sb.trackRequest),
-		OnBeforeRequest(sb.trackCoursesAndAssessments),
 		OnAfterRequest(sb.trackError),
 	)
 }
@@ -247,6 +247,17 @@ func (t *SupabaseTelemetry) trackCoursesAndAssessments(req http.Request) {
 	}, false, "", "minimal", "").Execute()
 	if err != nil {
 		log.Println(err)
+	}
+}
+
+func displayPath(lg *log.Logger) func(http.Request) {
+	return func(req http.Request) {
+		lg.Printf("PATH: %s\n", req.URL)
+
+		split := strings.Split(req.URL.Path, "/")
+		out := strings.Join(split, " | ")
+
+		lg.Println("SPLIT:", out)
 	}
 }
 
