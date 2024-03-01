@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/speedata/optionparser"
 
@@ -24,16 +26,39 @@ const ( // I was told it was okay to put these here... :p
 	decanterClientSecret = "fGVpQqJ0SdLGp7hfyN9wCn6VvuzU9djJfRklRPRQGGk"
 )
 
-func newAutolabClient(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) *http.Client {
-	ts, err := Autolab.NewAutolabTokenSource(fs, authClient)
-	if err != nil {
-		panic(err)
-	}
+func newAutolabHTTPClient(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) *http.Client {
+	ts := Autolab.NewAutolabTokenSource(fs, authClient)
 
 	oauth2Client := oauth2.NewClient(context.Background(), ts)
 	oauth2Client.Transport = WithTelemetry(oauth2Client)
 
 	return oauth2Client
+}
+
+func pollLatestSubmission(c *http.Client, host, course, assessment string) (Autolab.SubmissionsResponse, error) {
+	const timeout = 2 * time.Minute
+	const pollInterval = 5 * time.Second
+	for {
+		select {
+		case <-time.After(timeout):
+			return Autolab.SubmissionsResponse{}, fmt.Errorf("timed out")
+		case <-time.Tick(pollInterval):
+			submissions, err := Autolab.GetSubmissions(c, host, course, assessment)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error fetching submissions: %v\n", err)
+				continue
+			}
+			var latest Autolab.SubmissionsResponse
+			for _, sub := range submissions {
+				if sub.Version > latest.Version {
+					latest = sub
+				}
+			}
+			if len(latest.Scores) > 0 {
+				return latest, nil
+			}
+		}
+	}
 }
 
 // Big TODO: Caching user datda (like courses and due dates)
@@ -53,7 +78,6 @@ func main() {
 	var course string
 	op.On("-c NAME", "--course NAME", "Specify a course. -c cse468-s24", &course)
 
-	// Wait... This doesn't actually do anything (yet) lol
 	var wait bool
 	op.On("-w", "--wait", "Waits for additional info (if applicable). ex: 'submit -w' will wait for and display results. (NOT CURRENTLY IMPLEMENTED)", &wait)
 
@@ -73,7 +97,7 @@ func main() {
 	}
 
 	fs := NewFileTokenStore("auth.json")
-	c := newAutolabClient(
+	c := newAutolabHTTPClient(
 		Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host),
 		fs,
 	)
@@ -140,6 +164,22 @@ func main() {
 		} else {
 			var emphasis = lipgloss.NewStyle().Bold(true).Foreground(colorPrimary).Render
 			fmt.Printf("%s %s to %s!\n", finished("Successfully submit"), emphasis(file), emphasis(assessment))
+		}
+		if wait {
+			var latest Autolab.SubmissionsResponse
+			spinner.New().
+				Style(spinStyle).
+				Title("Waiting for grading...").
+				Action(func() {
+					latest, err = pollLatestSubmission(c, host, course, assessment)
+				}).Run()
+			if err != nil {
+				errStr := fmt.Sprintf("Error fetching submission... :(\nCheck your arguments:\nCourse: %s\nAssessment: %s", course, assessment)
+				fmt.Println(errStr)
+				return
+			}
+			fmt.Println(finished("Submission graded"))
+			displaySubmission(latest)
 		}
 	case "list":
 		if len(ex) < 2 {
