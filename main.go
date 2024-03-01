@@ -16,7 +16,7 @@ import (
 )
 
 // By default, we're running in production mode.
-const PROD = "TRUE"
+var PROD = "TRUE"
 
 const ( // I was told it was okay to put these here... :p
 	host                 = "https://autolab.cse.buffalo.edu"
