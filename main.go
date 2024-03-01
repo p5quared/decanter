@@ -64,6 +64,7 @@ func main() {
 	err := op.Parse()
 	if err != nil {
 		fmt.Println("Error parsing command: ", err)
+		return
 	}
 	ex := op.Extra
 	if len(ex) == 0 {
