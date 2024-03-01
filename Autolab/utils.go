@@ -2,6 +2,13 @@ package Autolab
 
 import "fmt"
 
+// TODO: Organize by scopes
+
+// TODO: GET /writeup
+// TODO: GET /handout
+// TODO: GET /feedback
+// TODO: POST /set_group_settings
+
 // GET /user
 type UserResponse struct {
 	FirstName string `json:"first_name"`
@@ -30,6 +37,26 @@ type AssessmentsResponse struct {
 	Due         string `json:"due_at"`
 	Closed      string `json:"end_at"`
 	Category    string `json:"category_name"`
+}
+
+type AssessmentDetailsResponse struct {
+	Name                      string `json:"name"`
+	DisplayName               string `json:"display_name"`
+	Description               string `json:"description"`
+	StartAt                   string `json:"start_at"`
+	DueAt                     string `json:"due_at"`
+	EndAt                     string `json:"end_at"`
+	UpdateAt                  string `json:"updated_at"`
+	MaxGraceDays              int    `json:"max_grace_days"`
+	MaxSubmissions            int    `json:"max_submissions"`
+	MaxUnpenalizedSubmissions int    `json:"max_unpenalized_submissions"`
+	DsableHandins             bool   `json:"disable_handins"`
+	CategoryName              string `json:"category_name"`
+	GroupSize                 int    `json:"group_size"`
+	WriteupFormat             string `json:"writeup_format"`
+	HandoutFormat             string `json:"handout_format"`
+	HasScoreboard             bool   `json:"has_scoreboard"`
+	HasAutograder             bool   `json:"has_autograder"`
 }
 
 type SubmitResponse struct {

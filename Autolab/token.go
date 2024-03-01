@@ -15,11 +15,11 @@ type TokenStore interface {
 	Save(oauth2.Token) error
 }
 
-func NewAutolabTokenSource(store TokenStore, ac AutolabOAuthClient) (*AutolabTokenSource, error) {
+func NewAutolabTokenSource(store TokenStore, ac AutolabOAuthClient) *AutolabTokenSource {
 	return &AutolabTokenSource{
 		ts: store,
 		ac: ac,
-	}, nil
+	}
 }
 
 // Checks if the token is expired and refreshes it if necessary

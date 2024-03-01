@@ -10,8 +10,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// This client implements the device flow for the autolab API.
-// This api is meant to emulate that of golang.org/x/oauth2
+// This client implements the device flow for the autolab API
+// and is similar to golang.org/x/oauth2 `config`
 type AutolabOAuthClient struct {
 	host      string
 	clientID  string
@@ -35,6 +35,7 @@ func NewAuthClient(clientID, clientSecret, host string) AutolabOAuthClient {
 	}
 }
 
+// TODO: This seems irrelevant
 func (a AutolabOAuthClient) DefaultSetup() (oauth2.Token, error) {
 	tok, err := a.DeviceSetup()
 	if err != nil {
