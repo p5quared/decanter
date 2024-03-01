@@ -83,9 +83,8 @@ func main() {
 	}
 
 	// check that we have a token
-	_, err = fs.Load()
-	if err != nil {
-		fmt.Println("Error: No token found. Please run 'decanter setup' to authorize a new device.")
+	if !tokenExists(fs) {
+		fmt.Println("No token found. Please run 'decanter setup' to authorize this device.")
 		return
 	}
 

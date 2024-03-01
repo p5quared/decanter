@@ -45,3 +45,11 @@ func testSpinner(t spinner.Type) {
 			time.Sleep(5 * time.Second)
 		}).Run()
 }
+
+func tokenExists(fs Autolab.TokenStore) bool {
+	_, err := fs.Load()
+	if err != nil {
+		return false
+	}
+	return true
+}
