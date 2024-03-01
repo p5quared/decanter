@@ -16,9 +16,9 @@ import (
 )
 
 // By default, we're running in production mode.
-var PROD = "TRUE"
+const PROD = "TRUE"
 
-var ( // I was told it was okay to put these here... :p
+const ( // I was told it was okay to put these here... :p
 	host                 = "https://autolab.cse.buffalo.edu"
 	decanterClientID     = "D4MZfAzZ27U121M2vwnHMEN6Cz-RMrQIKMlVjpEuKh8"
 	decanterClientSecret = "fGVpQqJ0SdLGp7hfyN9wCn6VvuzU9djJfRklRPRQGGk"

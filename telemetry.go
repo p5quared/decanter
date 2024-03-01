@@ -154,7 +154,7 @@ func DebugMiddleware(c *http.Client) *MiddlewareRoundTripper {
 	)
 }
 
-var ( // These are anon keys, so we good
+const ( // These are anon keys, so we good
 	supabaseUrlLive = "https://wgbxigfylkllztzhjykd.supabase.co"
 	supabaseKeyLive = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnYnhpZ2Z5bGtsbHp0emhqeWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg4MjY5NDcsImV4cCI6MjAyNDQwMjk0N30.vx_E8RClyIOsfGwAxa6O-J2cvvlT9ajcCf72_kwmI64"
 
