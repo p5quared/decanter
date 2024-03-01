@@ -11,50 +11,40 @@ import (
 )
 
 // These functions are used for user interaction with the Autolab API.
-// TODO: None of these should panic.
-
-// Get submissions for a single assessment
-// TODO: This grabs an arbitrary score for now
-func GetSubmissions(client *http.Client, host, course, assessment string) ([]SubmissionsResponse, error) {
-	endpoint := UrlSubmissions(host, course, assessment)
-
+func GetAutolab(client *http.Client, endpoint string, res interface{}) error {
 	resp, err := client.Get(endpoint)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	err = json.NewDecoder(resp.Body).Decode(res)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-	var subs []SubmissionsResponse
-	err = json.NewDecoder(resp.Body).Decode(&subs)
+// Get submissions for a single assessment
+func GetSubmissions(client *http.Client, host, course, assessment string) ([]SubmissionsResponse, error) {
+	var submissions []SubmissionsResponse
+	err := GetAutolab(client, UrlSubmissions(host, course, assessment), &submissions)
 	if err != nil {
 		return nil, err
 	}
-	return subs, nil
+	return submissions, nil
 }
 
 func GetUserInfo(httpClient *http.Client, host string) (UserResponse, error) {
-	endpoint := UrlUser(host)
-	resp, err := httpClient.Get(endpoint)
-	if err != nil {
-		return UserResponse{}, err
-	}
-
 	var user UserResponse
-	err = json.NewDecoder(resp.Body).Decode(&user)
+	err := GetAutolab(httpClient, UrlUser(host), &user)
 	if err != nil {
 		return UserResponse{}, err
 	}
-
 	return user, nil
 }
 
 func GetUserCourses(httpClient *http.Client, host string) ([]CoursesResponse, error) {
-	endpoint := UrlCourses(host)
-	resp, err := httpClient.Get(endpoint)
-	if err != nil {
-		return nil, err
-	}
 	var courses []CoursesResponse
-	err = json.NewDecoder(resp.Body).Decode(&courses)
+	err := GetAutolab(httpClient, UrlCourses(host), &courses)
 	if err != nil {
 		return nil, err
 	}
@@ -62,18 +52,12 @@ func GetUserCourses(httpClient *http.Client, host string) ([]CoursesResponse, er
 }
 
 func GetUserAssessments(httpClient *http.Client, host, course string) ([]AssessmentsResponse, error) {
-	endpoint := UrlAssessments(host, course)
-
-	resp, err := httpClient.Get(endpoint)
+	var assessments []AssessmentsResponse
+	err := GetAutolab(httpClient, UrlAssessments(host, course), &assessments)
 	if err != nil {
 		return nil, err
 	}
-	var assmts []AssessmentsResponse
-	err = json.NewDecoder(resp.Body).Decode(&assmts)
-	if err != nil {
-		return nil, err
-	}
-	return assmts, nil
+	return assessments, nil
 }
 
 func SubmitFile(httpClient *http.Client, host, course, assmnt, fName string) (SubmitResponse, error) {
