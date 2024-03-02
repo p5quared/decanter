@@ -1,6 +1,16 @@
 package Autolab
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
+
+// Parse times returned from Autolab API
+func ParseTime(t string) time.Time {
+	layout := "2006-01-02T15:04:05.000-07:00"
+	parsed, _ := time.Parse(layout, t)
+	return parsed
+}
 
 // TODO: Organize by scopes
 
