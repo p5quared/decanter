@@ -26,6 +26,11 @@ var (
 		return sty.Render(checkMark + s)
 	}
 
+	errorMsg = func(s string) string {
+		sty := lipgloss.NewStyle().Foreground(colorPrimary)
+		return sty.Render("ERROR: ") + s
+	}
+
 	emph = func(s string) string {
 		return lipgloss.NewStyle().Foreground(colorPrimary).Render(s)
 	}

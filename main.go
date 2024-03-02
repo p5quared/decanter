@@ -45,7 +45,7 @@ func pollLatestSubmission(c *http.Client, host, course, assessment string) (Auto
 		case <-time.Tick(pollInterval):
 			submissions, err := Autolab.GetSubmissions(c, host, course, assessment)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error fetching submissions: %v\n", err)
+				fmt.Println(errorMsg("Polling failure: " + err.Error()))
 				continue
 			}
 			var latest Autolab.SubmissionsResponse
@@ -87,12 +87,12 @@ func main() {
 
 	err := op.Parse()
 	if err != nil {
-		fmt.Println("Error parsing command: ", err)
+		fmt.Println(errorMsg(err.Error()))
 		return
 	}
 	ex := op.Extra
 	if len(ex) == 0 {
-		fmt.Println("No command specified.")
+		fmt.Println(errorMsg("No command specified."))
 		return
 	}
 
@@ -109,7 +109,7 @@ func main() {
 
 	// check that we have a token
 	if !tokenExists(fs) {
-		fmt.Println("No token found. Please run 'decanter setup' to authorize this device.")
+		fmt.Println(errorMsg("No token found. Please run 'decanter setup' to authorize this device."))
 		return
 	}
 
@@ -151,16 +151,19 @@ func main() {
 		if file == "" || assessment == "" || course == "" {
 			return // User cancelled
 		}
-		fmt.Printf("Submitting %s to %s...\n", file, assessment)
+		tStr := fmt.Sprintf("Submitting %s to %s...", file, assessment)
 		var err error
 		spinner.New().
-			Title(" Submitting file to Autolab...").
+			Title(tStr).
 			Style(spinStyle).
 			Action(func() {
 				_, err = Autolab.SubmitFile(c, host, course, assessment, file)
 			}).Run()
 		if err != nil {
-			fmt.Println("Error submitting file: ", err)
+			// Not sure why, but we need this, otherwise the text is getting pushed over.
+			fmt.Println()
+			fmt.Println(errorMsg("Decanter could not submit.") + "\n" + err.Error())
+			return
 		} else {
 			var emphasis = lipgloss.NewStyle().Bold(true).Foreground(colorPrimary).Render
 			fmt.Printf("%s %s to %s!\n", finished("Successfully submit"), emphasis(file), emphasis(assessment))
@@ -174,8 +177,8 @@ func main() {
 					latest, err = pollLatestSubmission(c, host, course, assessment)
 				}).Run()
 			if err != nil {
-				errStr := fmt.Sprintf("Error fetching submission... :(\nCheck your arguments:\nCourse: %s\nAssessment: %s", course, assessment)
-				fmt.Println(errStr)
+				errStr := fmt.Sprintf("Something went wrong while waiting for grading.\n%s", err.Error())
+				fmt.Println(errorMsg(errStr))
 				return
 			}
 			fmt.Println(finished("Submission graded"))
@@ -217,7 +220,7 @@ func main() {
 			displayAssessmentList(c, courses)
 		case "submissions", "subs":
 			if course == "" || assessment == "" {
-				fmt.Println("Error: To view submissions, please pass a course and assessment")
+				fmt.Println(errorMsg("To view submissions, please pass a course and assessment."))
 				return
 			}
 			var submissions []Autolab.SubmissionsResponse
@@ -228,8 +231,8 @@ func main() {
 					submissions, err = Autolab.GetSubmissions(c, host, course, assessment)
 				}).Run()
 			if err != nil {
-				errStr := fmt.Sprintf("Error fetching submissions... :(\nCheck your arguments:\nCourse: %s\nAssessment: %s", course, assessment)
-				fmt.Println(errStr)
+				errStr := fmt.Sprintf("Something went wrong while fetching submissions. \nCheck your arguments:\nCourse: %s\nAssessment: %s", course, assessment)
+				fmt.Println(errorMsg(errStr))
 				return
 			}
 			doneStr := fmt.Sprintf("Fetched submisions for %s", course)
