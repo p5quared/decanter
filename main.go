@@ -1,11 +1,7 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/speedata/optionparser"
 
@@ -14,10 +10,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/p5quared/decanter/Autolab"
-	"golang.org/x/oauth2"
 )
 
-// By default, we're running in production mode.
+// By default, we're running in production mode. Yee haw!
 var PROD = "TRUE"
 
 const ( // I was told it was okay to put these here... :p
@@ -25,41 +20,6 @@ const ( // I was told it was okay to put these here... :p
 	decanterClientID     = "D4MZfAzZ27U121M2vwnHMEN6Cz-RMrQIKMlVjpEuKh8"
 	decanterClientSecret = "fGVpQqJ0SdLGp7hfyN9wCn6VvuzU9djJfRklRPRQGGk"
 )
-
-func newAutolabHTTPClient(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) *http.Client {
-	ts := Autolab.NewAutolabTokenSource(fs, authClient)
-
-	oauth2Client := oauth2.NewClient(context.Background(), ts)
-	oauth2Client.Transport = WithTelemetry(oauth2Client)
-
-	return oauth2Client
-}
-
-func pollLatestSubmission(c *http.Client, host, course, assessment string) (Autolab.SubmissionsResponse, error) {
-	const timeout = 2 * time.Minute
-	const pollInterval = 5 * time.Second
-	for {
-		select {
-		case <-time.After(timeout):
-			return Autolab.SubmissionsResponse{}, fmt.Errorf("timed out")
-		case <-time.Tick(pollInterval):
-			submissions, err := Autolab.GetSubmissions(c, host, course, assessment)
-			if err != nil {
-				fmt.Println(errorMsg("Polling failure: " + err.Error()))
-				continue
-			}
-			var latest Autolab.SubmissionsResponse
-			for _, sub := range submissions {
-				if sub.Version > latest.Version {
-					latest = sub
-				}
-			}
-			if len(latest.Scores) > 0 {
-				return latest, nil
-			}
-		}
-	}
-}
 
 // Big TODO: Caching user datda (like courses and due dates)
 func main() {

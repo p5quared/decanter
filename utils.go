@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/charmbracelet/huh/spinner"
 	"github.com/p5quared/decanter/Autolab"
+	"golang.org/x/oauth2"
 )
 
 func filter[T any](elements []T, p func(T) bool) []T {
@@ -52,4 +56,39 @@ func tokenExists(fs Autolab.TokenStore) bool {
 		return false
 	}
 	return true
+}
+
+func newAutolabHTTPClient(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) *http.Client {
+	ts := Autolab.NewAutolabTokenSource(fs, authClient)
+
+	oauth2Client := oauth2.NewClient(context.Background(), ts)
+	oauth2Client.Transport = WithTelemetry(oauth2Client)
+
+	return oauth2Client
+}
+
+func pollLatestSubmission(c *http.Client, host, course, assessment string) (Autolab.SubmissionsResponse, error) {
+	const timeout = 2 * time.Minute
+	const pollInterval = 5 * time.Second
+	for {
+		select {
+		case <-time.After(timeout):
+			return Autolab.SubmissionsResponse{}, fmt.Errorf("timed out")
+		case <-time.Tick(pollInterval):
+			submissions, err := Autolab.GetSubmissions(c, host, course, assessment)
+			if err != nil {
+				fmt.Println(errorMsg("Polling failure: " + err.Error()))
+				continue
+			}
+			var latest Autolab.SubmissionsResponse
+			for _, sub := range submissions {
+				if sub.Version > latest.Version {
+					latest = sub
+				}
+			}
+			if len(latest.Scores) > 0 {
+				return latest, nil
+			}
+		}
+	}
 }
