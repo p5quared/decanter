@@ -11,9 +11,8 @@ or build from source via `go install`.
 ## Usage
 
 Before you can do much of anything, you need to setup Decanter via `decanter setup`.
-You will be prompted to 
 
-To view an overview, use `decanter -h`.
+To view a command overview, use `decanter -h`.
 
 Some examples are:
 
