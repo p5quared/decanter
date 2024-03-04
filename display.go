@@ -193,7 +193,7 @@ func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenSto
 	fmt.Printf("\n    Visit %s and enter the code %s to authenticate.\n\n", url(dResp.VerificationURI), emph(dResp.UserCode))
 
 	spinner.New().
-		Title(" Polling server to for access code...").
+		Title(" Polling server for access code...").
 		Type(spinner.Dots).
 		Style(spinStyle).
 		Action(func() {
@@ -232,5 +232,5 @@ func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenSto
 	finStyle := lipgloss.NewStyle().
 		Foreground(colorPrimary).Bold(true).
 		PaddingTop(1).PaddingLeft(2)
-	fmt.Println(finStyle.Render("Decanter setup complete!"))
+	fmt.Println(finStyle.Render("Decanter setup complete! Try `decanter list me`"))
 }
