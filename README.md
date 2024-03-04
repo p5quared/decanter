@@ -4,8 +4,12 @@ Decanter is a CLI app for interacting with Autolab at UB (University at Buffalo 
 _Pour_ data from your computer to Autolab, a little more seamlessly.
 
 ## Installation
-`brew install p5quared/decanter/decanter`
-or build from source via `go install`.
+
+If you have [homebrew](https://brew.sh/) you can install via tap like so:
+```shell
+brew install p5quared/decanter/decanter
+```
+Otherwise, you can build from source if you have [go](https://go.dev/) installed via `go install`.
 
 
 ## Usage
