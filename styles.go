@@ -46,7 +46,7 @@ func decanterFormStyle() *huh.Theme {
 	f := &t.Focused
 	f.Title = lipgloss.NewStyle().Foreground(colorPrimary)
 	f.Description = lipgloss.NewStyle().Foreground(lipgloss.Color("250"))
-	f.Base.Foreground(colorSpecial).BorderForeground(colorPrimary)
+	f.Base.Foreground(colorPrimary).BorderForeground(colorPrimary)
 
 	f.Directory = lipgloss.NewStyle().Foreground(colorSpecial)
 
