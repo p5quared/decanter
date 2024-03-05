@@ -103,12 +103,15 @@ func displayRespError(lg *log.Logger) func(http.Response, error) {
 	}
 }
 
-func NewMiddleware(transport *oauth2.Transport, opts ...func(*MiddlewareRoundTripper)) *MiddlewareRoundTripper {
+type Middleware func(*MiddlewareRoundTripper)
+
+// Attach middleware to our http client
+func NewMiddleware(transport *oauth2.Transport, middlewareFuncs ...Middleware) *MiddlewareRoundTripper {
 	m := &MiddlewareRoundTripper{
 		RoundTripper: transport,
 		logger:       log.New(io.Discard, "No logging by default.", log.LstdFlags),
 	}
-	for _, f := range opts {
+	for _, f := range middlewareFuncs {
 		f(m)
 	}
 	return m
