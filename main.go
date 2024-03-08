@@ -73,7 +73,8 @@ func main() {
 		return
 	}
 
-	switch ex[0] {
+	cmd := ex[0]
+	switch cmd {
 	case "setup":
 		interactiveSetup(Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host), fs)
 	// TODO: Should be a multipart form;
