@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/huh/spinner"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
@@ -233,4 +234,15 @@ func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenSto
 		Foreground(colorPrimary).Bold(true).
 		PaddingTop(1).PaddingLeft(2)
 	fmt.Println(finStyle.Render("Decanter setup complete! Try `decanter list me`"))
+}
+
+func areYouSure(msg, affirm, neg string) (ans bool) {
+	huh.NewConfirm().
+		Title(msg).
+		Value(&ans).
+		Affirmative(affirm).
+		Negative(neg).
+		WithTheme(decanterFormStyle()).
+		Run()
+	return
 }
