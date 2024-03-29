@@ -59,19 +59,15 @@ func main() {
 		return
 	}
 
-	fs := NewFileTokenStore("auth.json")
-	c := newAutolabHTTPClient(
-		Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host),
-		fs,
-	)
+	ac := AutoLabInit()
 
 	if ex[0] == "setup" {
-		interactiveSetup(Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host), fs)
+		interactiveSetup(ac.AutolabOAuthClient, ac.TokenStore)
 		return
 	}
 
 	// check that we have a token
-	if !tokenExists(fs) {
+	if !tokenExists(ac.TokenStore) {
 		fmt.Println(errorMsg("No token found. Please run 'decanter setup' to authorize this device."))
 		return
 	}
@@ -79,7 +75,7 @@ func main() {
 	cmd := ex[0]
 	switch cmd {
 	case "setup":
-		interactiveSetup(Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host), fs)
+		interactiveSetup(ac.AutolabOAuthClient, ac.TokenStore)
 	// TODO: Should be a multipart form;
 	// 1. Select course
 	// 2. Select assessment
@@ -121,7 +117,7 @@ func main() {
 			Title(tStr).
 			Style(spinStyle).
 			Action(func() {
-				_, err = Autolab.SubmitFile(c, host, course, assessment, file)
+				_, err = Autolab.SubmitFile(ac.Client, host, course, assessment, file)
 			}).Run()
 		if err != nil {
 			// Not sure why, but we need this, otherwise the text is getting pushed over.
@@ -138,7 +134,7 @@ func main() {
 				Style(spinStyle).
 				Title("Waiting for grading...").
 				Action(func() {
-					latest, err = pollLatestSubmission(c, host, course, assessment)
+					latest, err = pollLatestSubmission(ac.Client, host, course, assessment)
 				}).Run()
 			if err != nil {
 				errStr := fmt.Sprintf("Something went wrong while waiting for grading.\n%s", err.Error())
@@ -160,7 +156,7 @@ func main() {
 				Title("Fetching course data...").
 				Style(spinStyle).
 				Action(func() {
-					courses, _ = Autolab.GetUserCourses(c, host)
+					courses, _ = Autolab.GetUserCourses(ac.Client, host)
 				}).Run()
 
 			// Default: Only show current semester
@@ -178,7 +174,7 @@ func main() {
 				Style(spinStyle).
 				Title("Fetching assessments...").
 				Action(func() {
-					courses, _ = Autolab.GetUserCourses(c, host)
+					courses, _ = Autolab.GetUserCourses(ac.Client, host)
 				}).Run()
 
 			if !all {
@@ -189,7 +185,7 @@ func main() {
 
 			// Technically this is a lie.
 			fmt.Println(finished("Fetched assessments"))
-			displayAssessmentList(c, courses)
+			displayAssessmentList(ac.Client, courses)
 		case "submissions", "subs":
 			if course == "" || assessment == "" {
 				fmt.Println(errorMsg("To view submissions, please pass a course and assessment."))
@@ -200,7 +196,7 @@ func main() {
 				Style(spinStyle).
 				Title("Fetching submissions...").
 				Action(func() {
-					submissions, err = Autolab.GetSubmissions(c, host, course, assessment)
+					submissions, err = Autolab.GetSubmissions(ac.Client, host, course, assessment)
 				}).Run()
 			if err != nil {
 				errStr := fmt.Sprintf("Something went wrong while fetching submissions. \nCheck your arguments:\nCourse: %s\nAssessment: %s", course, assessment)
@@ -225,7 +221,7 @@ func main() {
 				Style(spinStyle).
 				Title("Fetching user data...").
 				Action(func() {
-					user, _ = Autolab.GetUserInfo(c, host)
+					user, _ = Autolab.GetUserInfo(ac.Client, host)
 				}).Run()
 			fmt.Println(finished("Fetched user data"))
 			displayUserInfo(user)

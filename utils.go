@@ -11,6 +11,26 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Kind of a messy struct that carries around all the
+// various Autolab-related clients and data.
+type AutolabClient struct {
+	*http.Client
+	Autolab.AutolabOAuthClient
+	Autolab.TokenStore
+	host string
+}
+
+func newAutolabClient(host string, authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) AutolabClient {
+	client := newAutolabHTTPClient(authClient, fs)
+	return AutolabClient{client, authClient, fs, host}
+}
+
+func AutoLabInit() AutolabClient {
+	fs := NewFileTokenStore("auth.json")
+	ac := Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host)
+	return newAutolabClient(host, ac, fs)
+}
+
 func filter[T any](elements []T, p func(T) bool) []T {
 	var f []T
 	for _, item := range elements {
