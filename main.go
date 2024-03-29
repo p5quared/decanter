@@ -41,6 +41,9 @@ func main() {
 	var wait bool
 	op.On("-w", "--wait", "Waits for additional info (if applicable). ex: 'submit -w' will wait for and display results. (NOT CURRENTLY IMPLEMENTED)", &wait)
 
+	var all bool
+	op.On("-a", "--all", "Display all (extra) data.", &all)
+
 	op.Command("setup", "Setup (authorize) a new device (you should only need to do this once).")
 	op.Command("submit", "Submit to an assessment.Available flags: --course, --assessment, --file, --wait")
 	op.Command("list", "List data. Args: courses|assessments|submissions|me")
@@ -158,10 +161,14 @@ func main() {
 				Style(spinStyle).
 				Action(func() {
 					courses, _ = Autolab.GetUserCourses(c, host)
-					courses = filterCourses(courses, func(c Autolab.CoursesResponse) bool {
-						return c.Semester == "s24"
-					})
 				}).Run()
+
+			// Default: Only show current semester
+			if !all {
+				courses = filterCourses(courses, func(c Autolab.CoursesResponse) bool {
+					return c.Semester == "s24"
+				})
+			}
 
 			fmt.Println(finished("Fetched course data"))
 			displayCourseList(courses)
@@ -172,10 +179,14 @@ func main() {
 				Title("Fetching assessments...").
 				Action(func() {
 					courses, _ = Autolab.GetUserCourses(c, host)
-					courses = filter(courses, func(c Autolab.CoursesResponse) bool {
-						return c.Semester == "s24"
-					})
 				}).Run()
+
+			if !all {
+				courses = filter(courses, func(c Autolab.CoursesResponse) bool {
+					return c.Semester == "s24"
+				})
+			}
+
 			// Technically this is a lie.
 			fmt.Println(finished("Fetched assessments"))
 			displayAssessmentList(c, courses)
