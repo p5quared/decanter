@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"path"
 
 	"golang.org/x/oauth2"
 )
@@ -13,18 +14,25 @@ type FileTokenStore struct {
 }
 
 func NewFileTokenStore(filename string) *FileTokenStore {
+
+	// Ideally we store tokens in ~/.decanter
+	path, _ := os.UserHomeDir()
+
+	dynamicLocation := path + "/.decanter"
+	os.MkdirAll(dynamicLocation, 0755)
+
 	return &FileTokenStore{
 		filename: filename,
-		dir:      os.TempDir(), // Wrong.
+		dir:      dynamicLocation,
 	}
 }
 
 func (f FileTokenStore) Load() (oauth2.Token, error) {
-	return LoadAuthFromFile(f.filename)
+	return LoadAuthFromFile(path.Join(f.dir, f.filename))
 }
 
 func (f FileTokenStore) Save(r oauth2.Token) error {
-	return SaveAuthToFile(r, f.filename)
+	return SaveAuthToFile(r, path.Join(f.dir, f.filename))
 }
 
 func SaveAuthToFile(r oauth2.Token, f string) error {
