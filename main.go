@@ -61,6 +61,15 @@ func main() {
 
 	ac := AutoLabInit()
 
+	if ex[0] == "setup" {
+		if tokenExists(ac.TokenStore) {
+			if !areYouSure("It looks like you already setup Decanter.", "Continue setup", "Abort") {
+				return
+			}
+		}
+		interactiveSetup(ac.AutolabOAuthClient, ac.TokenStore)
+		return
+	}
 	// check that we have a token
 	if !tokenExists(ac.TokenStore) {
 		fmt.Println(errorMsg("No token found. Please run 'decanter setup' to authorize this device."))
