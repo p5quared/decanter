@@ -42,7 +42,7 @@ func main() {
 	op.On("-w", "--wait", "Waits for additional info (if applicable). ex: 'submit -w' will wait for and display results. (NOT CURRENTLY IMPLEMENTED)", &wait)
 
 	var all bool
-	op.On("-a", "--all", "Display all (extra) data.", &all)
+	op.On("--all", "Display all (extra) data.", &all)
 
 	op.Command("setup", "Setup (authorize) a new device (you should only need to do this once).")
 	op.Command("submit", "Submit to an assessment.Available flags: --course, --assessment, --file, --wait")
