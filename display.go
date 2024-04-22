@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strconv"
 
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/huh/spinner"
@@ -122,7 +123,6 @@ func displayTime(time_raw string) string {
 }
 
 func displaySubmission(submission Autolab.SubmissionsResponse) {
-
 	title := emph("Latest Submission")
 	fmt.Println(title)
 	fmt.Println(" Version: ", submission.Version)
@@ -151,21 +151,26 @@ func displaySubmission(submission Autolab.SubmissionsResponse) {
 			}
 		})
 	scores := submission.Scores
-	keys := make([]string, 0, len(scores))
+	keys := make([]int, 0, len(scores))
 	for k := range scores {
-		keys = append(keys, k)
+		// WARN: I'm assuming that all keys are integer strings
+		// I'm not positive that this is the case...
+		// TODO: A better way is to probably 'try' to do this
+		// and have a fallback if it fails
+		intKey, _ := strconv.Atoi(k)
+		keys = append(keys, intKey)
 	}
 
-	sort.Strings(keys)
+	sort.Ints(keys)
 
 	for _, k := range keys {
-		t.Row(k, fmt.Sprintf("%.2f", scores[k]))
+		strKey := strconv.Itoa(k)
+		t.Row(strKey, fmt.Sprintf("%.2f", scores[strKey]))
 	}
 	fmt.Println(t.Render())
 }
 
 // Complete device flow and cache token to disk
-// TODO: Should ask to abort if token already exists
 func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) {
 	// 1. DeviceAuth
 	// 2. DeviceAccessCode
