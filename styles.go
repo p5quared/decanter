@@ -8,7 +8,7 @@ import (
 var (
 	colorPrimary     = lipgloss.Color("124")
 	colorTextPrimary = lipgloss.Color("254")
-	colorTextSubtle  = lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#383838"}
+	colorTextSubtle  = lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#787878"}
 	colorSpecial     = lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}
 
 	url = lipgloss.NewStyle().
