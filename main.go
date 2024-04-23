@@ -44,6 +44,9 @@ func main() {
 	var all bool
 	op.On("--all", "Display all (extra) data.", &all)
 
+	var interactive bool
+	op.On("-i", "--interactive", "Run in interactive mode.", &interactive)
+
 	op.Command("setup", "Setup (authorize) a new device (you should only need to do this once).")
 	op.Command("submit", "Submit to an assessment.Available flags: --course, --assessment, --file, --wait")
 	op.Command("list", "List data. Args: courses|assessments|submissions|me")
@@ -96,6 +99,10 @@ func main() {
 	// to avoid user having to re-enter it.
 	// Prompt like "Resubmit [file] to [assessment]?"
 	case "submit":
+		if interactive {
+			InteractiveSubmit(ac.Client, course, assessment, file, wait)
+			return
+		}
 		if course == "" || assessment == "" || file == "" {
 			// TODO: Form theme.
 			huh.NewForm(
