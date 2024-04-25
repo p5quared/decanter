@@ -28,12 +28,24 @@ Some examples are:
 * `decanter list assessments`
 * `decanter submit -c cse305-s24 -a pangram -f main.ml`
 
+## Tips
+
+Remembering the full submit command can get quite tedious
+for your projects. Consider writing a per-project script
+to automate this process. For instance, if your project
+came with a `Makefile` or you want to use 
+[just](https://github.com/casey/just), you could 
+add a recipe like so:
+
+```makefile
+submit: submission
+	decanter submit -c COURSE_ID -a ASSESSMENT -f FILE -w 
+```
+
 ## Notes
 
-This tool was constructed at a feverous pace by one whom many
-might refer to as a ravenous madman. If you find issues
-or have suggestions, I'd love to hear about them in the
-Github issues section.
+If you find issues or have suggestions, 
+I'd love to hear about them in the Github issues section.
 
 Contributions would be appreciated. If you'd like to contribute,
 please email me or write an issue first. There's also a long
