@@ -38,7 +38,7 @@ came with a `Makefile` or you want to use
 add a recipe like so:
 
 ```makefile
-submit: submission
+submit: 
 	decanter submit -c COURSE_ID -a ASSESSMENT -f FILE -w 
 ```
 
