@@ -99,10 +99,6 @@ func main() {
 	// to avoid user having to re-enter it.
 	// Prompt like "Resubmit [file] to [assessment]?"
 	case "submit":
-		if interactive {
-			InteractiveSubmit(ac.Client, course, assessment, file, wait)
-			return
-		}
 		if course == "" || assessment == "" || file == "" {
 			// TODO: Form theme.
 			huh.NewForm(
