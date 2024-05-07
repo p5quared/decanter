@@ -6,10 +6,8 @@ import (
 )
 
 var (
-	colorPrimary     = lipgloss.Color("124")
-	colorTextPrimary = lipgloss.Color("254")
-	colorTextSubtle  = lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#787878"}
-	colorSpecial     = lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}
+	colorPrimary = lipgloss.Color("124")
+	colorSpecial = lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}
 
 	url = lipgloss.NewStyle().
 		Foreground(colorSpecial).
@@ -51,7 +49,7 @@ func decanterFormStyle() *huh.Theme {
 	f.Directory = lipgloss.NewStyle().Foreground(colorSpecial)
 
 	f.SelectedOption = lipgloss.NewStyle().Foreground(colorPrimary)
-	f.UnselectedOption = lipgloss.NewStyle().Foreground(colorTextPrimary)
+	f.UnselectedOption = lipgloss.NewStyle()
 
 	ti := &f.TextInput
 	ti.Cursor = lipgloss.NewStyle().Foreground(colorPrimary)

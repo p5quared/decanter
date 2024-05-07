@@ -20,8 +20,7 @@ func displayUserInfo(user Autolab.UserResponse) {
 		Foreground(colorPrimary).
 		Bold(true)
 
-	var body = lipgloss.NewStyle().
-		Foreground(colorTextPrimary)
+	var body = lipgloss.NewStyle()
 
 	// UB Autolab API doesn't appear to return anything else for now.
 	// Could just be because I'm a transfer and have less info though...
@@ -51,8 +50,7 @@ func displayCourseList(courses []Autolab.CoursesResponse) {
 		fmt.Println(courseStyle.Render(s))
 	}
 
-	var helpStyle = lipgloss.NewStyle().
-		Foreground(colorTextSubtle).PaddingLeft(1)
+	var helpStyle = lipgloss.NewStyle()
 
 	helpStr := "[Course Name]               (Course ID)"
 	fmt.Println(helpStyle.Render(helpStr))
@@ -68,12 +66,10 @@ func displayAssessmentList(httpClient *http.Client, courses []Autolab.CoursesRes
 	fmt.Println(headerStyle.Render("Your Assessments:"))
 
 	var OddRowStyle = lipgloss.NewStyle().
-		Align(lipgloss.Left).
-		Foreground(colorTextPrimary)
+		Align(lipgloss.Left)
 
 	var EvenRowStyle = lipgloss.NewStyle().
-		Inherit(OddRowStyle).
-		Foreground(colorTextSubtle)
+		Inherit(OddRowStyle)
 
 	t := table.New().
 		Headers("Course", "Assessment", "Assigned", "Due Date", "Closed").
@@ -130,12 +126,10 @@ func displaySubmission(submission Autolab.SubmissionsResponse) {
 	fmt.Println(" Filename: ", submission.Filename)
 
 	var OddRowStyle = lipgloss.NewStyle().
-		Align(lipgloss.Left).
-		Foreground(colorTextPrimary)
+		Align(lipgloss.Left)
 
 	var EvenRowStyle = lipgloss.NewStyle().
-		Inherit(OddRowStyle).
-		Foreground(colorTextSubtle)
+		Inherit(OddRowStyle)
 
 	t := table.New().
 		Headers("Problem", "Score").
