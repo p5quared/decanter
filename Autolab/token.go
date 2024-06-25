@@ -2,10 +2,10 @@ package Autolab
 
 import "golang.org/x/oauth2"
 
-// AutolabTokenSource implements the oauth2.TokenSource interface
+// TokenSource implements the oauth2.TokenSource interface
 // It is expected that there already exists a Token
 // The main purpose is to be used with oauth2.NewClient
-type AutolabTokenSource struct {
+type TokenSource struct {
 	ts TokenStore
 	ac AutolabOAuthClient
 }
@@ -15,8 +15,8 @@ type TokenStore interface {
 	Save(oauth2.Token) error
 }
 
-func NewAutolabTokenSource(store TokenStore, ac AutolabOAuthClient) *AutolabTokenSource {
-	return &AutolabTokenSource{
+func NewTokenSource(store TokenStore, ac AutolabOAuthClient) *TokenSource {
+	return &TokenSource{
 		ts: store,
 		ac: ac,
 	}
@@ -26,7 +26,7 @@ func NewAutolabTokenSource(store TokenStore, ac AutolabOAuthClient) *AutolabToke
 // TODO: actually check if the token is expired;
 // for now we just refresh every time
 // Must return pointer to satisfy the interface
-func (a AutolabTokenSource) Token() (*oauth2.Token, error) {
+func (a TokenSource) Token() (*oauth2.Token, error) {
 	token, err := a.ts.Load()
 	if err != nil {
 		return nil, err

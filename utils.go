@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -13,22 +12,22 @@ import (
 
 // Kind of a messy struct that carries around all the
 // various Autolab-related clients and data.
-type AutolabClient struct {
-	*http.Client
-	Autolab.AutolabOAuthClient
-	Autolab.TokenStore
+type Decanter struct {
+	Autolab.Autolab
+	auth Autolab.AutolabOAuthClient
+	ts   Autolab.TokenStore
 	host string
 }
 
-func newAutolabClient(host string, authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) AutolabClient {
-	client := newAutolabHTTPClient(authClient, fs)
-	return AutolabClient{client, authClient, fs, host}
-}
-
-func AutoLabInit() AutolabClient {
+func NewDecanter() Decanter {
 	fs := NewFileTokenStore("auth.json")
 	ac := Autolab.NewAuthClient(decanterClientID, decanterClientSecret, host)
-	return newAutolabClient(host, ac, fs)
+
+	ts := Autolab.NewTokenSource(fs, ac)
+	oauth2Client := oauth2.NewClient(context.Background(), ts)
+	autolabClient := Autolab.NewAutolab(oauth2Client)
+
+	return Decanter{autolabClient, ac, fs, host}
 }
 
 func filter[T any](elements []T, p func(T) bool) []T {
@@ -70,8 +69,8 @@ func testSpinner(t spinner.Type) {
 		}).Run()
 }
 
-func tokenExists(fs Autolab.TokenStore) bool {
-	_, err := fs.Load()
+func (d Decanter) tokenExists() bool {
+	_, err := d.ts.Load()
 	if err != nil {
 		return false
 	}
@@ -79,36 +78,10 @@ func tokenExists(fs Autolab.TokenStore) bool {
 }
 
 func newAutolabHTTPClient(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) *http.Client {
-	ts := Autolab.NewAutolabTokenSource(fs, authClient)
+	ts := Autolab.NewTokenSource(fs, authClient)
 
 	oauth2Client := oauth2.NewClient(context.Background(), ts)
-	oauth2Client.Transport = WithTelemetry(oauth2Client)
+	// oauth2Client.Transport = WithTelemetry(oauth2Client)
 
 	return oauth2Client
-}
-
-func pollLatestSubmission(c *http.Client, host, course, assessment string) (Autolab.SubmissionsResponse, error) {
-	const timeout = 2 * time.Minute
-	const pollInterval = 5 * time.Second
-	for {
-		select {
-		case <-time.After(timeout):
-			return Autolab.SubmissionsResponse{}, fmt.Errorf("timed out")
-		case <-time.Tick(pollInterval):
-			submissions, err := Autolab.GetSubmissions(c, host, course, assessment)
-			if err != nil {
-				fmt.Println(errorMsg("Polling failure: " + err.Error()))
-				continue
-			}
-			var latest Autolab.SubmissionsResponse
-			for _, sub := range submissions {
-				if sub.Version > latest.Version {
-					latest = sub
-				}
-			}
-			if len(latest.Scores) > 0 {
-				return latest, nil
-			}
-		}
-	}
 }

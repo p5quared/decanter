@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"sort"
 	"strconv"
 
@@ -56,7 +55,7 @@ func displayCourseList(courses []Autolab.CoursesResponse) {
 	fmt.Println(helpStyle.Render(helpStr))
 }
 
-func displayAssessmentList(httpClient *http.Client, courses []Autolab.CoursesResponse) {
+func displayAssessmentList(d Decanter, courses []Autolab.CoursesResponse) {
 	var headerStyle = lipgloss.NewStyle().
 		Align(lipgloss.Left).
 		Bold(true).
@@ -87,7 +86,7 @@ func displayAssessmentList(httpClient *http.Client, courses []Autolab.CoursesRes
 
 	var assessmentsFetched int
 	for _, course := range courses {
-		assessments, _ := Autolab.GetUserAssessments(httpClient, host, course.Name)
+		assessments, _ := d.GetUserAssessments(course.Name)
 		for _, ass := range assessments {
 			assessmentsFetched++
 
@@ -165,7 +164,7 @@ func displaySubmission(submission Autolab.SubmissionsResponse) {
 }
 
 // Complete device flow and cache token to disk
-func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenStore) {
+func (d Decanter) interactiveSetup() {
 	// 1. DeviceAuth
 	// 2. DeviceAccessCode
 	// 3. Exchange
@@ -183,7 +182,7 @@ func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenSto
 		Title("Initiating device flow...").
 		Style(spinStyle).
 		Action(func() {
-			dResp, err = authClient.DeviceAuth()
+			dResp, err = d.auth.DeviceAuth()
 		}).Run()
 	if err != nil {
 		fmt.Println("Error starting device flow: ", err)
@@ -197,7 +196,7 @@ func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenSto
 		Type(spinner.Dots).
 		Style(spinStyle).
 		Action(func() {
-			dCode, err = authClient.DeviceAccessCode(dResp)
+			dCode, err = d.auth.DeviceAccessCode(dResp)
 		}).Run()
 	if err != nil || dCode == "" {
 		fmt.Println("Error getting code: ", err)
@@ -209,7 +208,7 @@ func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenSto
 		Title("Exchanging code for token...").
 		Style(spinStyle).
 		Action(func() {
-			token, err = authClient.ExchangeCodeForToken(dCode)
+			token, err = d.auth.ExchangeCodeForToken(dCode)
 		}).Run()
 	if err != nil {
 		fmt.Println("Error exchanging code for token: ", err)
@@ -221,7 +220,7 @@ func interactiveSetup(authClient Autolab.AutolabOAuthClient, fs Autolab.TokenSto
 		Title("Saving credentials...").
 		Style(spinStyle).
 		Action(func() {
-			err = fs.Save(token)
+			err = d.ts.Save(token)
 		}).Run()
 	if err != nil {
 		fmt.Println("Error saving token: ", err)

@@ -62,19 +62,19 @@ func main() {
 		return
 	}
 
-	ac := AutoLabInit()
+	decanter := NewDecanter()
 
 	if ex[0] == "setup" {
-		if tokenExists(ac.TokenStore) {
+		if decanter.tokenExists() {
 			if !areYouSure("It looks like you already setup Decanter.", "Continue setup", "Abort") {
 				return
 			}
 		}
-		interactiveSetup(ac.AutolabOAuthClient, ac.TokenStore)
+		decanter.interactiveSetup()
 		return
 	}
 	// check that we have a token
-	if !tokenExists(ac.TokenStore) {
+	if !decanter.tokenExists() {
 		fmt.Println(errorMsg("No token found. Please run 'decanter setup' to authorize this device."))
 		return
 	}
@@ -82,12 +82,12 @@ func main() {
 	cmd := ex[0]
 	switch cmd {
 	case "setup":
-		if tokenExists(ac.TokenStore) {
+		if decanter.tokenExists() {
 			if !areYouSure("It looks like you already setup Decanter.", "Continue setup", "Abort") {
 				return
 			}
 		}
-		interactiveSetup(ac.AutolabOAuthClient, ac.TokenStore)
+		decanter.interactiveSetup()
 	// TODO: Should be a multipart form;
 	// 1. Select course
 	// 2. Select assessment
@@ -129,7 +129,7 @@ func main() {
 			Title(tStr).
 			Style(spinStyle).
 			Action(func() {
-				_, err = Autolab.SubmitFile(ac.Client, host, course, assessment, file)
+				_, err = decanter.SubmitFile(course, assessment, file)
 			}).Run()
 		if err != nil {
 			// Not sure why, but we need this, otherwise the text is getting pushed over.
@@ -140,13 +140,14 @@ func main() {
 			var emphasis = lipgloss.NewStyle().Bold(true).Foreground(colorPrimary).Render
 			fmt.Printf("%s %s to %s!\n", finished("Successfully submit"), emphasis(file), emphasis(assessment))
 		}
+
 		if wait {
 			var latest Autolab.SubmissionsResponse
 			spinner.New().
 				Style(spinStyle).
 				Title("Waiting for grading...").
 				Action(func() {
-					latest, err = pollLatestSubmission(ac.Client, host, course, assessment)
+					latest, err = decanter.PollLatestSubmission(course, assessment)
 				}).Run()
 			if err != nil {
 				errStr := fmt.Sprintf("Something went wrong while waiting for grading.\n%s", err.Error())
@@ -168,7 +169,7 @@ func main() {
 				Title("Fetching course data...").
 				Style(spinStyle).
 				Action(func() {
-					courses, _ = Autolab.GetUserCourses(ac.Client, host)
+					courses, _ = decanter.GetUserCourses()
 				}).Run()
 
 			// Default: Only show current semester
@@ -186,7 +187,7 @@ func main() {
 				Style(spinStyle).
 				Title("Fetching assessments...").
 				Action(func() {
-					courses, _ = Autolab.GetUserCourses(ac.Client, host)
+					courses, _ = decanter.GetUserCourses()
 				}).Run()
 
 			if !all {
@@ -197,7 +198,7 @@ func main() {
 
 			// Technically this is a lie.
 			fmt.Println(finished("Fetched assessments"))
-			displayAssessmentList(ac.Client, courses)
+			displayAssessmentList(decanter, courses)
 		case "submissions", "subs":
 			if course == "" || assessment == "" {
 				fmt.Println(errorMsg("To view submissions, please pass a course and assessment."))
@@ -208,7 +209,7 @@ func main() {
 				Style(spinStyle).
 				Title("Fetching submissions...").
 				Action(func() {
-					submissions, err = Autolab.GetSubmissions(ac.Client, host, course, assessment)
+					submissions, err = decanter.GetSubmissions(course, assessment)
 				}).Run()
 			if err != nil {
 				errStr := fmt.Sprintf("Something went wrong while fetching submissions. \nCheck your arguments:\nCourse: %s\nAssessment: %s", course, assessment)
@@ -233,7 +234,7 @@ func main() {
 				Style(spinStyle).
 				Title("Fetching user data...").
 				Action(func() {
-					user, _ = Autolab.GetUserInfo(ac.Client, host)
+					user, _ = decanter.GetUserInfo()
 				}).Run()
 			fmt.Println(finished("Fetched user data"))
 			displayUserInfo(user)
