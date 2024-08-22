@@ -26,7 +26,7 @@ Some examples are:
 
 * `decanter list me`
 * `decanter list assessments`
-* `decanter submit -c cse305-s24 -a pangram -f main.ml`
+* `decanter submit -c cse486-s24 -a PA2-Raft-Cluster -f submission.tar`
 
 ## Tips
 
