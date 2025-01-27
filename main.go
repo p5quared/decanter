@@ -36,7 +36,7 @@ func main() {
 	op.On("-a NAME", "--assessment NAME", "Specify an assessment. -a pa1", &assessment)
 
 	var course string
-	op.On("-c NAME", "--course NAME", "Specify a course. -c cse468-s24", &course)
+	op.On("-c NAME", "--course NAME", "Specify a course. -c cse476-s25", &course)
 
 	var wait bool
 	op.On("-w", "--wait", "Waits for additional info (if applicable). ex: 'submit -w' will wait for and display results. (NOT CURRENTLY IMPLEMENTED)", &wait)
@@ -175,7 +175,7 @@ func main() {
 			// Default: Only show current semester
 			if !all {
 				courses = filterCourses(courses, func(c Autolab.CoursesResponse) bool {
-					return c.Semester == "s24"
+					return c.Semester == "s25"
 				})
 			}
 
@@ -192,7 +192,7 @@ func main() {
 
 			if !all {
 				courses = filter(courses, func(c Autolab.CoursesResponse) bool {
-					return c.Semester == "s24"
+					return c.Semester == "s25"
 				})
 			}
 
