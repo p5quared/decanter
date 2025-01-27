@@ -42,7 +42,7 @@ changelog:
 brews:
   -
     name: decanter
-    tap:
+    repository:
       owner: p5quared
       name: homebrew-decanter
 
