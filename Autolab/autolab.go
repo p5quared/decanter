@@ -71,12 +71,13 @@ func (a Autolab) GetUserAssessments(course string) ([]AssessmentsResponse, error
 	return assessments, nil
 }
 
-func (a Autolab) PollLatestSubmission(course, assessment string) (SubmissionsResponse, error) {
+func (a Autolab) PollLatestSubmission(course, assessment string, oldVersion int) (SubmissionsResponse, error) {
 	const timeout = 2 * time.Minute
 	const pollInterval = 10 * time.Second
 	for {
 		select {
 		case <-time.After(timeout):
+			// TODO: It would be nice to display time out vs error to user
 			return SubmissionsResponse{}, fmt.Errorf("timed out")
 		case <-time.Tick(pollInterval):
 			submissions, err := a.GetSubmissions(course, assessment)
@@ -87,13 +88,11 @@ func (a Autolab) PollLatestSubmission(course, assessment string) (SubmissionsRes
 				return SubmissionsResponse{}, fmt.Errorf("no submissions found")
 			}
 
-			var latest SubmissionsResponse
 			for _, sub := range submissions {
-				if sub.Version > latest.Version {
-					latest = sub
+				if sub.Version > oldVersion && sub.Scores != nil && len(sub.Scores) > 0 {
+					return sub, nil
 				}
 			}
-			return latest, nil
 		}
 	}
 }
