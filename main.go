@@ -123,6 +123,29 @@ func main() {
 		if file == "" || assessment == "" || course == "" {
 			return // User cancelled
 		}
+
+		// Retrieve the last submitted version before submitting,
+		// we will wait for version + 1.
+		var submissions []Autolab.SubmissionsResponse
+		spinner.New().
+			Style(spinStyle).
+			Title("Fetching submissions...").
+			Action(func() {
+				submissions, err = decanter.GetSubmissions(course, assessment)
+			}).Run()
+		if err != nil {
+			errStr := fmt.Sprintf("Something went wrong while fetching submissions. \nCheck your arguments:\nCourse: %s\nAssessment: %s", course, assessment)
+			fmt.Println(errorMsg(errStr))
+			return
+		}
+
+		var lastSubVersion int
+		for _, sub := range submissions {
+			if sub.Version > lastSubVersion {
+				lastSubVersion = sub.Version
+			}
+		}
+
 		tStr := fmt.Sprintf("Submitting %s to %s...", file, assessment)
 		var err error
 		spinner.New().
@@ -145,9 +168,9 @@ func main() {
 			var latest Autolab.SubmissionsResponse
 			spinner.New().
 				Style(spinStyle).
-				Title("Waiting for grading...").
+				Title(fmt.Sprintf("Waiting for grading of version %d...", lastSubVersion)).
 				Action(func() {
-					latest, err = decanter.PollLatestSubmission(course, assessment)
+					latest, err = decanter.PollLatestSubmission(course, assessment, lastSubVersion)
 				}).Run()
 			if err != nil {
 				errStr := fmt.Sprintf("Something went wrong while waiting for grading.\n%s", err.Error())
