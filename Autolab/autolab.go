@@ -73,7 +73,7 @@ func (a Autolab) GetUserAssessments(course string) ([]AssessmentsResponse, error
 
 func (a Autolab) PollLatestSubmission(course, assessment string) (SubmissionsResponse, error) {
 	const timeout = 2 * time.Minute
-	const pollInterval = 5 * time.Second
+	const pollInterval = 10 * time.Second
 	for {
 		select {
 		case <-time.After(timeout):
