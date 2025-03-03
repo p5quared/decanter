@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sort"
-	"strconv"
 
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/huh/spinner"
@@ -144,21 +142,9 @@ func displaySubmission(submission Autolab.SubmissionsResponse) {
 			}
 		})
 	scores := submission.Scores
-	keys := make([]int, 0, len(scores))
-	for k := range scores {
-		// WARN: I'm assuming that all keys are integer strings
-		// I'm not positive that this is the case...
-		// TODO: A better way is to probably 'try' to do this
-		// and have a fallback if it fails
-		intKey, _ := strconv.Atoi(k)
-		keys = append(keys, intKey)
-	}
 
-	sort.Ints(keys)
-
-	for _, k := range keys {
-		strKey := strconv.Itoa(k)
-		t.Row(strKey, fmt.Sprintf("%.2f", scores[strKey]))
+	for k, v := range scores {
+		t.Row(k, fmt.Sprintf("%.2f", v))
 	}
 	fmt.Println(t.Render())
 }
